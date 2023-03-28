@@ -95,7 +95,7 @@
       }
       ```
 ## 原型、原型链有什么特点？
-原型：prototype，每个对象、构造函数都有自己的原型对象
+原型：prototype，每个对象、构造函数都有自己的原型对象<br>
 原型链：prototype chain，原型对象也可能拥有原型，并从中继承方法和属性
 一切对象都是继承自Object对象，Object.prototype.__proto__ === null，null为原型链最顶端
 ![image](https://user-images.githubusercontent.com/60378935/228116525-221853e5-f748-42f9-bdca-13ca91df1c5b.png)
