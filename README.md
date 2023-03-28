@@ -6,7 +6,7 @@
 - 关键字new绑定：
   1. 创建一个空对象
   2. 空对象链接到原型对象上
-  3. 原型对象被绑定为this
+  3. 新对象被绑定为this
   4. 如果函数不返回任何东西，默认return this
 - 显式绑定：call、apply或者bind，this指向第一个传参
 - 隐式绑定/默认绑定
@@ -27,7 +27,29 @@
   - 共同点：显式绑定，让this指向第一个传参。如果第一个传参是null或者undefined，this默认是全局对象，浏览器中就是window
   - 不同点：
     - bind:返回一个函数，可分开传入参数
-      
+      ```
+      Function.prototype.myBind = function() {
+          var thatFunc = this, 
+              thatArg = arguments[0];
+          var args = Array.prototype.slice.call(arguments, 1)
+          if (typeof thatFunc !== 'function') {
+              throw new TypeError('Function.prototype.bind - ' +
+                   'what is trying to be bound is not callable');
+          }
+          var fBound  = function() {
+              return thatFunc.apply(this instanceof fBound
+                       ? this
+                       : thatArg,
+                       args.concat(Array.prototype.slice.call(arguments)));
+              };
+          var fNOP = function() {};       // 讲道理看得不是很懂，先跳过了。。。
+          if (thatFunc.prototype) {
+            fNOP.prototype = thatFunc.prototype; 
+          }
+          fBound.prototype = new fNOP();
+          return fBound;
+      }
+      ```
     - call:剩余传参须单独传入，返回函数执行结果
       ```
       Function.prototype.myOwnCall = function(context) {
@@ -38,7 +60,7 @@
         }
         context[uniqueID] = this;
 
-        var args = [];
+        var args = [];                                        // 这一步有待商榷，call跟apply一样传入的是入参数组，有问题，待我跟博主battle一下
         for (var i = 1; i < arguments.length; i++) {  
           args.push("arguments[" + i + "]");
         }
@@ -72,3 +94,22 @@
         return result;
       }
       ```
+## 原型、原型链有什么特点？
+原型：prototype，每个对象、构造函数都有自己的原型对象
+原型链：prototype chain，原型对象也可能拥有原型，并从中继承方法和属性
+一切对象都是继承自Object对象，Object.prototype.__proto__ === null，null为原型链最顶端
+![image](https://user-images.githubusercontent.com/60378935/228116525-221853e5-f748-42f9-bdca-13ca91df1c5b.png)
+
+## new操作符具体干了什么？如何实现？
+  1. 创建一个空对象
+  2. 空对象链接到原型对象上
+  3. 新对象被绑定为this
+  4. 有返回值，且返回值类型为对象，则返回；如果函数不返回任何东西，默认return this
+  ```
+  function myNew() {
+    var constr = Array.prototype.shift.call(arguments);
+    var obj = Object.create(constr.prototype);
+    var result = constr.apply(obj, arguments);
+    return result instanceof Object? result : obj;
+  }
+  ```
