@@ -2,7 +2,7 @@
 
 # JavaScript
 ## this的指向
-- 箭头函数：无视其它规则，this指向箭头函数创建时的作用域<br>
+- 箭头函数：无视其它规则，this指向箭头函数创建时的作用域
 - 关键字new绑定：
   1. 创建一个空对象
   2. 空对象链接到构造函数的原型上
@@ -25,8 +25,8 @@
   - 默认绑定：无调用对象，非严格模式下，this是全局对象，浏览器中就是window。严格模式下，this是undefined
   
 ## 原型、原型链有什么特点？
-原型：prototype，每个对象、构造函数都有自己的原型对象<br>
-原型链：prototype chain，原型对象也可能拥有原型，并从中继承方法和属性
+- 原型：prototype，每个对象、构造函数都有自己的原型对象
+- 原型链：prototype chain，原型对象也可能拥有原型，并从中继承方法和属性
 一切对象都是继承自Object对象，Object.prototype.__proto__ === null，null为原型链最顶端
 ![image](https://user-images.githubusercontent.com/60378935/228116525-221853e5-f748-42f9-bdca-13ca91df1c5b.png)
 
@@ -122,5 +122,23 @@ function myNew() {
   var obj = Object.create(constr.prototype);
   var result = constr.apply(obj, arguments);
   return result instanceof Object? result : obj;
+}
+```
+
+## instanceof的作用？如何实现？
+检测构造函数的prototype是否出现在某个实例的原型链上
+```
+function _instanceof(left, right) {
+  const prototype = right.prototype;
+  let proto = left.__proto__;
+  while(true) {
+    if(proto === null || proto === undefined) {
+      return false;
+    }
+    if(prototype === proto) {
+      return true;
+    } 
+    proto = proto.__proto__;
+  }
 }
 ```
