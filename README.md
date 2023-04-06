@@ -193,7 +193,7 @@ function _instanceof(left, right) {
   - 而在IE盒模型中，width代表的是content + padding + border，所以width就是盒模型最终在浏览器渲染后显示的宽大小。
 
 ## 元素水平垂直居中的方法有哪些？如果元素不定宽高呢？
-### 内联元素居中布局
+### 行内元素居中布局
 - 水平居中：行内元素可设置：text-align: center
 - 垂直居中：单行文本父元素确认高度：height === line-height
 
