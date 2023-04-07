@@ -36,7 +36,7 @@ console.log(Object.prototype.toString.call(function() {})); //[object Function]
 - 堆（heap）
   - 动态分配内存，内存大小不固定，也不会自动释放
   - 堆数据结构是一种无序的树状结构，存储方式是key-value键值对
-  - 引用数据类型存放在堆内存中，在堆内存中分配一个新的空间，栈内存中保存该空间的内存地址，因此引用类型的变量保存的是内存地址
+  - 引用数据类型存放在堆内存中，在堆内存中分配一个新的空间，栈内存中保存该空间的内存地址，因此引用类型的变量保存的是内存地址<br>
 ![image](https://user-images.githubusercontent.com/60378935/230064781-0e4608c0-981c-48e9-a10f-ff11a0d48e2c.png)
 
 
