@@ -24,7 +24,8 @@ console.log(typeof a)
 
 ## JavaScript类型检测的方法
 ### typeof
-返回类型字符串。typeof null会返回object，历史遗留问题；typeof [1,2,3]会返回object
+- 返回类型字符串
+- 缺陷：typeof null和数组，会返回object
 ### instanceof
 基于原型链操作，原理：判断右边构造函数的prototype是否出现在左边实例对象的原型链上
 ### Object.prototype.toString
@@ -83,11 +84,10 @@ prototype chain，原型对象也可能拥有原型，并从中继承方法和�
 ### 共同点
 都会被变量提升
 ### 不同点
-- let和const定义的变量都会被提升，但是不会被初始化，不能被引用
-- let和const只在块级作用域中有效
+- let和const定义的变量都会被提升，但是不会被初始化，不能被引用<br>
+  暂时性死区：指声明之前使用变量，就会报错
+- let和const只在块级作用域中有效，不会绑定全局作用域
 - let和const不允许重复声明
-- let和const不会绑定全局作用域
-- 暂时性死区：指声明之前使用变量，就会报错
 
 ## bind、call和apply的区别？分别如何实现？
 ### 共同点
@@ -160,12 +160,14 @@ Function.prototype._apply = function(context) {
 1. 创建一个空对象
 2. 空对象的__proto__指向构造函数的原型对象prototype上
 3. 执行构造函数中的代码，给空对象添加新属性
-4. 有返回值，且返回值类型为对象，则返回；如果函数不返回任何东西，默认返回这个新对象
+4. 有返回值，且返回值类型为对象，则返回；如果函数不返回任何东西，默认返回这个新对象<br>
 ```
 function myNew(Func) {
   var obj = {};
   obj.__proto__ = Func.prototype;
   var result = Func.apply(obj, [...arguments].slice(1))
+  // new关键字，并不是所有返回值都原封不动地返回
+  // 如果返回的是undefined，null以及基本类型的时候，都会返回新的对象；而只有返回对象的时候，才会返回构造函数的返回值
   return result instanceof Object? result : obj;
 }
 ```
@@ -192,10 +194,10 @@ function _instanceof(left, right) {
 ### 含义
 可以在一个内层函数中访问到其外层函数的作用域
 ### 作用
-- 阻止变量被GC垃圾回收，在函数执行完成，由于变量被引用，延长变量的生命周期
+- 阻止变量被垃圾回收，在函数执行完成，由于变量被引用，延长变量的生命周期
 - 函数外部可以读取函数内部的数据，利用这一特性可以实现私有变量和私有方法
 ### 缺点
-使用不当造成内存泄漏：由于闭包会使得函数内部变量长期保存在内存当中，不会被GC垃圾回收机制回收
+使用不当造成内存泄漏：由于闭包会使得函数内部变量长期保存在内存当中，不会被垃圾回收机制回收
 ### 应用
 - 围绕2点作用：1、创建私有变量 2、延长变量的生命周期
 - 计数器、延迟调用、回调
@@ -231,6 +233,34 @@ function _instanceof(left, right) {
   - 定宽：margin auto
   - 绝对定位+left/top:50%+margin:负自身一半
   - flex布局设置父元素：display: flex; justify-content: center; align-items: center;
+
+## 说说flexbox（弹性盒布局模型）,以及适用场景？
+采用Flex布局的元素，称为container容器，它的所有子元素自动成为容器成员，称为item。默认存在两条轴：主轴和交叉轴。项目默认沿主轴排列，通过flex-direction来决定主轴的方向。
+### 常用属性
+#### 容器属性
+- flex-direction：决定主轴的方向(即项目的排列方向)。包含row、row-reverse、column、column-reverse等值
+- flex-wrap：决定容器内项目是否可换行。包含：wrap、nowrap、wrap-reverse等值
+- flex-flow：是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap
+- justify-content：定义项目在主轴上的对齐方式。包含flex-start、flex-end、center、space-between、space-around
+- align-items：定义项目在交叉轴上的对齐方式。包含flex-start、flex-end、center、baseline、stretch
+- align-content：定义多根轴线的对齐方式。包含flex-start、flex-end、center、space-between、space-around、stretch
+#### 项目属性
+- order：定义项目的排列顺序。数值越小，排列越靠前，默认为0
+- flex-grow：定义项目的放大比例（容器宽度>元素总宽度时如何伸展
+  - 默认为0，即如果存在剩余空间，也不放大
+  - 如果所有项目的flex-grow属性都为1，则项目将等分剩余空间
+  - 如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍
+- flex-shrink：定义了项目的缩小比例（容器宽度<元素总宽度时如何收缩）
+  - 默认为1，即如果空间不足，该项目将缩小。
+- flex-basis：元素在主轴上的初始尺寸，默认值为auto，即项目的本来大小
+  - 当设置为0时，会根据内容撑开
+  - 可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间
+- flex：flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。建议优先使用这个属性，因为浏览器会推算相关值
+  - flex: 1 = flex: 1 1 0%
+  - flex: 2 = flex: 2 1 0%
+  - flex: auto = flex: 1 1 auto
+  - flex: none = flex: 0 0 auto，常用于固定尺寸不伸缩
+- align-self：允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。包含flex-start、flex-end、center、baseline、stretch等值
 
 # Vue
 ## 父子组件生命周期顺序？
