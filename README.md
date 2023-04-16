@@ -9,7 +9,7 @@ Number（数字），String（字符串），Boolean（布尔），Null（空）
 Object
 ### Symbol
 es6特性，主要用于创建唯一标识符；不可被let in遍历
-```
+```js
 const s = Symbol('key')
 const a = {
   [s]: 'value'
@@ -17,7 +17,7 @@ const a = {
 ```
 ### BigInt
 解决大整数运算
-```
+```js
 const a = 1n  //  声明方式：数字后面添加n
 console.log(typeof a)
 ```
@@ -30,7 +30,7 @@ console.log(typeof a)
 基于原型链操作，原理：判断右边构造函数的prototype是否出现在左边实例对象的原型链上
 ### Object.prototype.toString
 js中较为精确判断变量类型的方法，它能够区别对象，数组，函数
-```
+```js
 console.log(Object.prototype.toString.call({ a: 1 })); //[object Object]
 console.log(Object.prototype.toString.call([1, 2, 3])); //[object Array]
 console.log(Object.prototype.toString.call(function() {})); //[object Function]
@@ -59,7 +59,7 @@ console.log(Object.prototype.toString.call(function() {})); //[object Function]
 ### 显式绑定
 call、apply或者bind，this指向第一个传参
 ### 隐式绑定/默认绑定
-```
+```js
 function foo() { 
   console.log(this.bar); 
 } 
@@ -94,7 +94,7 @@ prototype chain，原型对象也可能拥有原型，并从中继承方法和�
 显式绑定，让this指向第一个传参。如果第一个传参是null或者undefined，this默认是全局对象，浏览器中就是window
 ### 不同点
 - bind:返回一个函数，可分开传入参数
-```
+```js
 // bind的实现
 Function.prototype._bind = function(context) {
   // 对调用者进行判断，只有函数类型才可以调用
@@ -117,7 +117,7 @@ Function.prototype._bind = function(context) {
 }
 ```
 - call:剩余传参须单独传入，返回函数执行结果
-```
+```js
 // call的实现
 Function.prototype._call = function(context) {
   // 对调用者进行判断，只有函数类型才可以调用
@@ -135,7 +135,7 @@ Function.prototype._call = function(context) {
 }
 ```
 - apply:剩余传参放在一个数组中传入，返回函数执行结果
-```
+```js
 // apply的实现
 Function.prototype._apply = function(context) {
   // 对调用者进行判断，只有函数类型才可以调用
@@ -161,7 +161,7 @@ Function.prototype._apply = function(context) {
 2. 空对象的__proto__指向构造函数的原型对象prototype上
 3. 执行构造函数中的代码，给空对象添加新属性
 4. 有返回值，且返回值类型为对象，则返回；如果函数不返回任何东西，默认返回这个新对象<br>
-```
+```js
 function myNew(Func) {
   var obj = {};
   obj.__proto__ = Func.prototype;
@@ -174,7 +174,7 @@ function myNew(Func) {
 
 ## instanceof的作用？如何实现？
 检测构造函数的prototype是否出现在某个实例的原型链上
-```
+```js
 function _instanceof(left, right) {
   const prototype = right.prototype;
   let proto = left.__proto__;
@@ -203,6 +203,95 @@ function _instanceof(left, right) {
 - 计数器、延迟调用、回调
 ### 注意事项
 创建新的对象或者类时，方法通常应该关联于对象的原型，而不是定义到对象的构造器中。原因是每个实例的创建，都会重新声明一遍方法，实际只在原型对象上声明一次就可以了
+
+## 深拷贝浅拷贝的区别？如何实现一个深拷贝？ 
+### 浅拷贝
+拷贝一层，深层次的引用类型则共享内存地址（我理解拷贝的就是变量存在栈内存里的值）
+#### 浅拷贝相关运算
+- Object.assign
+  ```js
+  var obj = {
+      age: 18,
+      nature: ['smart', 'good'],
+      names: {
+          name1: 'fx',
+          name2: 'xka'
+      },
+      love: function () {
+          console.log('fx is a great girl')
+      }
+  }
+  var newObj = Object.assign({}, fxObj);
+  ```
+- slice()
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = fxArr.slice(0)
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+- concat()
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = fxArr.concat()
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+- ...拓展运算符
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = [...fxArr]
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+### 深拷贝
+开辟一个新的栈，两个对象属性完成相同，但是对应两个不同的地址，修改一个对象的属性，不会改变另一个对象的属性
+### 实现深拷贝
+- _.cloneDeep()
+- JSON.stringify()
+  ```js
+  const obj2 = JSON.parse(JSON.stringify(obj1));
+  ```
+  存在弊端，会忽略undefined、symbol、函数
+- 手写循环递归
+  ```js
+  function getType(target) {
+    return Object.prototype.toString.call(target).slice(8, -1);
+  }
+
+  function arrayClone(arr, newArr) {
+    for(let item of arr) {
+      if(getType(item) === 'Array') {
+        newArr.push(arrayClone(item, []));
+      } else if(getType(item) === 'Object') {
+        newArr.push(deepClone(item, {}));
+      } else {
+        newArr.push(item);
+      }
+    }
+    return newArr;
+  }
+
+  function deepClone(obj, newObj) {
+    const keys = Object.keys(obj);
+    for(let key of keys) {
+      let item = obj[key];
+      if(getType(item) === 'Array') {
+        newObj[key] = arrayClone(item, [])
+      } else if(getType(item) === 'Object') {
+        newObj[key] = deepClone(item, {});
+      } else {
+        newObj[key] = item;
+      }
+    }
+    return newObj;
+  }
+  ```
+## 说说你对事件循环的理解
+
 
 # CSS
 ## 对盒子模型的理解？
