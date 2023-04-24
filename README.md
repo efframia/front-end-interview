@@ -318,6 +318,8 @@ Promise、MutaionObserver、process.nextTick(Node.js环境）
 - 渲染完毕后，JS线程继续接管，从宏任务队列中获取第一个宏任务到执行栈中，重复以上步骤<br>
 ![image](https://user-images.githubusercontent.com/60378935/232436720-53de9a90-5f38-4c62-8e0c-a6473926fdaa.png)
 
+## 说说对commonJS和ES Module的理解？
+
 # CSS
 ## 对盒子模型的理解？
 ### 盒子模型是什么？
